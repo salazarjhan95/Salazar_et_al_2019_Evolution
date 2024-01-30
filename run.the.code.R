@@ -79,5 +79,39 @@ summary.simmap <-summary(simmap.reg)
 
 
 ## We chose the model with the lowest AIC value, in this case it was OUMVA
-
 OUMVA.fitted.pruned <- lapply(1:500, function(x) OUwie(simmap.reg[[x]], datos.ouwie, model="OUMVA", simmap.tree=TRUE, mserr = "known")) # We're going to run this analysis 500 times
+
+#For mainland: sigma squared
+OUMVA.fitted.pruned[[1]]$solution[,1] 
+sigma2.oumva.mainland <- lapply(1:500, function(x) OUMVA.fitted.pruned[[x]]$solution[,1]) # Here, we are extracting the values for sigma squared from all of our similations
+df_main <- data.frame(t(sapply(sigma2.oumva.mainland,c))) # We're creating a new data frame with the sigma squared values
+df_main
+
+landmass <- rep(c("mainland"), times = 500) # Here, we're creating a new column in the data frame.
+landmass <- data.frame(landmass)
+landmass
+
+df_main2 <- cbind(df_main, landmass)
+df_main2
+#write.csv(df_main, file = "data_mainland_jul20-2023.csv")
+
+
+#For island: sigma squared
+OUMVA.fitted.pruned[[1]]$solution[,2]
+sigma2.oumva.island <- lapply(1:500, function(x) OUMVA.fitted.pruned[[x]]$solution[,2])
+df_island <- data.frame(t(sapply(sigma2.oumva.island,c)))
+df_island
+
+landmass <- rep(c("island"), times = 500)
+landmass <- data.frame(landmass)
+landmass
+
+df_island2 <- cbind(df_island, landmass)
+df_island2
+
+df_bio6_alphasigma <- rbind(df_main2, df_island2)
+colnames(df_bio6_alphasigma) <- c("sigma.sq", "alpha", "landmass")
+df_bio6_alphasigma
+
+write.csv(df_bio6_alphasigma, file = "df_bio6_alphasigma_bio6_Cal.csv")
+
